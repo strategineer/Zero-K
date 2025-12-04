@@ -36,6 +36,7 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 -------------------------------------------------------------------------------
 
 local BUTTON_COLOR = {0.15, 0.39, 0.45, 0.85}
+local BUTTON_COLOR_FLASH = {0.85, 0.61, 0.55, 0.85}
 local BUTTON_COLOR_FACTORY = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_WARNING = {1, 0.2, 0.1, 1}
 local BUTTON_COLOR_DISABLED = {0.2,0.2,0.2,1}
@@ -81,6 +82,8 @@ local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
 
+local consButton
+local isConsButtonFlashing = false
 local wantUpdateCons = false
 local readyUntaskedBombers = {}	-- [unitID] = true
 local idleConCount = 0
@@ -1608,7 +1611,8 @@ local function InitializeControls()
 	buttonHolder = mainBackground.GetButtonsHolder()
 	
 	buttonList = GetButtonListHandler(mainBackground)
-	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, GetConstructorButton(buttonHolder))
+	consButton = GetConstructorButton(buttonHolder)
+	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, consButton)
 		
 	buttonHolder.OnResize[#buttonHolder.OnResize + 1] = ButtonHolderResize
 	
@@ -1773,8 +1777,20 @@ function widget:Update(dt)
 		ClearData()
 	end
 	
-	if wantUpdateCons then
-		buttonList.GetButton(CONSTRUCTOR_BUTTON_ID).UpdateButton()
+	-- todo(strategineer) flash button
+	if consButton and idleConCount > 0 then
+		Spring.Echo("FLASH")
+		if not isConsButtonFlashing then
+			consButton.SetImageColor(BUTTON_COLOR_FLASH)
+			isConsButtonFlashing = true
+		else
+			consButton.SetImageColor(BUTTON_COLOR)
+			isConsButtonFlashing = false
+		end
+	end
+	
+	if consButton and wantUpdateCons then
+		consButton.UpdateButton()
 		wantUpdateCons = false
 	end
 
