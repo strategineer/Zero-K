@@ -644,7 +644,8 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 
 	if (jumping[unitID]) then
-		return true, false -- command was used but don't remove it (unit is still jumping)
+		-- todo(strategineer) show the jump destination (lastJumpPosition[unitID]?) somehow, need a shader? or it might be much easier to remove the command once it's almost reached the destination
+		return true, true -- command was used, remove it immediately
 	end
 
 	if lastJumpPosition[unitID] then
@@ -652,6 +653,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				abs(lastJumpPosition[unitID][3] - cmdParams[3]) < 1 then
 			return true, true -- command was used, remove it (unit finished jump)
 		end
+		-- todo(strategineer) remove the shader here
 		lastJumpPosition[unitID] = nil
 	end
 	
@@ -664,6 +666,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if (distSqr < (range*range)) then
 		if (Spring.GetUnitRulesParam(unitID, "jumpReload") >= 1) and Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1 then
 			local coords = table.concat(cmdParams)
+			--gl.DrawGroundCircle(coords[1], coords[2], coords[3], 4, 10) 
 			local currFrame = spGetGameFrame()
 			for allCoords, oldStuff in pairs(jumps) do
 				if currFrame-oldStuff[2] > 150 then
