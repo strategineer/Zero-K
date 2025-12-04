@@ -33,6 +33,7 @@ local gameID = Spring.GetGameRulesParam('GameID')
 local randomChosen = false
 local randomAlbumUseSeed = nil 
 local continueAlbum = false
+local hasPlayedWarningJingle = false
 local function SetRandomSeed()
 	if seed then
 		math.randomseed(seed)
@@ -329,6 +330,13 @@ function widget:Update(dt)
 		-- case replay: widget:gameID() hasn't been triggered yet
 		randomAlbumUseSeed = false
 		continueAlbum = false
+	end
+	
+	-- todo(strategineer) this doesn't work and also it's unclear what the issue #5377 is really asking for
+	if not hasPlayedWarningJingle and Spring.GetGameRulesParam(pregame_timer_seconds) > 0 then
+		Spring.Echo("PLAYING PRE GAME JINGLE")
+		Spring.PlaySoundFile("sounds/beep4_decrackled.wav")
+		hasPlayedWarningJingle = true
 	end
 	
 	timeframetimer_short = timeframetimer_short + dt

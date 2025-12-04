@@ -37,7 +37,7 @@ if gadgetHandler:IsSyncedCode() then
 		if not secondsUntilStart then
 			return
 		end
-
+		--todo(strategineer) here's a value I probably can get elsewhere with `local spGetGameRulesParam = Spring.GetGameRulesParam
 		Spring.SetGameRulesParam("pregame_timer_seconds", secondsUntilStart)
 		SendToUnsynced("PreGameTimekeeping", secondsUntilStart)
 	end
