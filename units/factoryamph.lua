@@ -54,6 +54,8 @@ return { factoryamph = {
     outline_x = 250,
     outline_y = 250,
     outline_yoff = 5,
+      
+    unit_path_type = "akbot4"
   },
 
   explodeAs        = [[LARGE_BUILDINGEX]],

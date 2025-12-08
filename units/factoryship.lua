@@ -51,6 +51,8 @@ return { factoryship = {
     outline_x = 340,
     outline_y = 340,
     outline_yoff = 25,
+    
+    unit_path_type = "uboat3"
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],

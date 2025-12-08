@@ -31,6 +31,7 @@ local spGetUnitCurrentBuildPower = Spring.GetUnitCurrentBuildPower
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spScaledGetMouseState = Spring.ScaledGetMouseState
 local spGetUnitShieldState = Spring.GetUnitShieldState
+local spSendCommands = Spring.SendCommands
 
 local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
 local GetUnitCost = Spring.Utilities.GetUnitCost
@@ -216,6 +217,7 @@ local windGroundMin
 local windGroundSlope
 local windMinBound
 local econMultEnabled
+local factoryUnitsTraversabilityEnabled = nil
 
 local GAIA_TEAM = Spring.GetGaiaTeamID()
 
@@ -2256,6 +2258,21 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 					UpdateDynamicFeatureAttributes(featureID, prevUnitDefID)
 				end
 				if unitDefID and not (unitID or featureID) then
+					-- show path types on mouse over factory in the command panel but not when placing a factory (because it doesn't work, likely requires engine changes)
+					if not mousePlaceX and not mousePlaceY and blueprint then
+						local ud = UnitDefs[unitDefID]
+						if ud ~= nil and (ud.isFactory or ud.isfakefactory) then
+							if factoryUnitsTraversabilityEnabled ~= ud.customParams.unit_path_type then
+								factoryUnitsTraversabilityEnabled = ud.customParams.unit_path_type
+								if ud.customParams.unit_path_type ~= nil then
+									spSendCommands(string.format("showpathtype %s", ud.customParams.unit_path_type))
+								else
+									-- turn off the path if it's still on
+									spSendCommands("showpathtraversability")
+								end
+							end
+						end
+					end
 					if blueprint then
 						UpdateBuildTime(unitDefID)
 					end
@@ -2406,6 +2423,11 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		end
 		if costInfoPanel and not (morphShown or blueprint) then
 			costInfoPanel(false)
+		end
+		
+		if not visible and factoryUnitsTraversabilityEnabled then
+			factoryUnitsTraversabilityEnabled = nil
+			spSendCommands("showpathtraversability")
 		end
 		
 		prevUnitID, prevUnitDefID, prevFeatureID, prevFeatureDefID = unitID, unitDefID, featureID, featureDefID
@@ -2904,7 +2926,6 @@ local function UpdateSelection(newSelection)
 		end
 	end
 	selectedUnitsList = newSelection
-
 	if (not newSelection) or (#newSelection == 0) then
 		selectionWindow.SetVisible(false)
 		return
@@ -2978,7 +2999,7 @@ function widget:Initialize()
 	Spring.AssignMouseCursor(CURSOR_POINT_NAME, CURSOR_POINT, true, true)
 	Spring.AssignMouseCursor(CURSOR_DRAW_NAME, CURSOR_DRAW, true, true)
 	
-	Spring.SendCommands({"tooltip 0"})
+	spSendCommands({"tooltip 0"})
 	Spring.SetDrawSelectionInfo(false)
 	
 	local hotkeys = WG.crude.GetHotkeys("drawinmap")
@@ -3037,7 +3058,7 @@ end
 
 function widget:Shutdown()
 	WG.ShutdownTranslation("gui_chili_selections_and_cursortip.lua")
-	Spring.SendCommands({"tooltip 1"})
+	spSendCommands({"tooltip 1"})
 	Spring.SetDrawSelectionInfo(true)
 	Spring.SetDrawSelectionInfo(true)
 end

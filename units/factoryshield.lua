@@ -49,6 +49,8 @@ return { factoryshield = {
     outline_x = 250,
     outline_y = 250,
     outline_yoff = 5,
+    
+    unit_path_type = "kbot3"
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

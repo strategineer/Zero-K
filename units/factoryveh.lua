@@ -52,6 +52,8 @@ return { factoryveh = {
     outline_x = 250,
     outline_y = 250,
     outline_yoff = 5,
+    
+    unit_path_type = "tank4"
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
